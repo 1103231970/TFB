@@ -3,7 +3,7 @@
 </div>
 
 
-[![PVLDB](https://img.shields.io/badge/PVLDB'24-TFB-orange)](https://arxiv.org/pdf/2403.20150.pdf)  [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)  [![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-blue)](https://pytorch.org/)  ![Stars](https://img.shields.io/github/stars/decisionintelligence/TFB)  [![Visits Badge](https://badges.pufler.dev/visits/decisionintelligence/TFB)](https://badges.pufler.dev/visits/decisionintelligence/TFB)
+[![PVLDB](https://img.shields.io/badge/PVLDB'24-TFB-orange)](https://arxiv.org/pdf/2403.20150.pdf)  [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)  [![PyTorch](https://img.shields.io/badge/PyTorch-2.4.1-blue)](https://pytorch.org/)  ![Stars](https://img.shields.io/github/stars/decisionintelligence/TFB)  
 
 # TFB: Towards Comprehensive and Fair Benchmarking of Time Series Forecasting Methods
 
@@ -13,11 +13,13 @@
 > 
 > 2、We have retested the results of some algorithms, which may differ from those in the TFB paper. You can find the hyperparameters we ultimately selected for each algorithm on each dataset in the [scripts](https://github.com/decisionintelligence/TFB/tree/master/scripts) folder, and their corresponding algorithm test results can be found on the [OpenTS](https://decisionintelligence.github.io/OpenTS/leaderboards/multivariate_time_series/)!
 
+🚩 **News** (2025.04) **TFB has open-sourced the [code](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Characteristics_Extractor.py) for computing time series characteristics, such as trend, seasonality, stationarity, shifting, transition, correlation, and more. Both [Chinese](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Readme_chn.md) and [English](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Readme_en.md) documentation are provided.**
+
 🚩 **News** (2025.04) **[DUET](https://arxiv.org/pdf/2412.10859) has released the results of a long-term forecasting task with unified hyperparameters, where the input length is fixed at 96 for all experiments. Click [here](https://github.com/decisionintelligence/DUET/blob/main/figures/DUET_unified_seq_len_96.pdf) to view the results, and click [here](https://github.com/decisionintelligence/DUET/blob/main/scripts/multivariate_forecast/DUET_unified_seq_len_96.sh) to view the script for reproducing the results.**
 
 🚩 **News** (2025.04) **TFB has added two new datasets: PEMS03 and PEMS07, bringing the total to 27 multivariate datasets**.
 
-🚩 **News** (2025.03) **TFB has added a [new practical feature](./docs/tutorials/steps_to_predict_only_a_subset_of_input_variables.md): support for predicting only a subset of input variables**.
+🚩 **News** (2025.03) **TFB has added a new practical feature: support for predicting only a subset of input variables. Both [Chinese](https://github.com/decisionintelligence/TFB/blob/master/docs/tutorials/steps_to_predict_only_a_subset_of_input_variables_chn.pdf) and [English](./docs/tutorials/steps_to_predict_only_a_subset_of_input_variables.md) documentation are provided.**
 
 🚩 **News** (2025.03) **We maintain a [WeChat group](./docs/figures/QR.png) to facilitate discussions about TFB and [OpenTS](https://decisionintelligence.github.io/OpenTS/)**.
 
@@ -174,8 +176,11 @@ You can find answer [here](./docs/tutorials/steps_to_train_models_with_multi_gpu
 
 6. How to predict only a subset of input variables?
    
-
 You can find answer [here](./docs/tutorials/steps_to_predict_only_a_subset_of_input_variables.md).
+
+7. Is there code in TFB's code base to compute the characteristics of the dataset?
+   
+TFB has open-sourced the [code](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Characteristics_Extractor.py) for computing time series characteristics, such as trend, seasonality, stationarity, shifting, transition, correlation, and more. Both [Chinese](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Readme_chn.md) and [English](https://github.com/decisionintelligence/TFB/blob/master/characteristics_extractor/Readme_en.md) documentation are provided.
 
 ## Citation
 
