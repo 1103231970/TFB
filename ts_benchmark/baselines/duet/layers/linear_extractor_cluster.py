@@ -277,14 +277,13 @@ class Linear_extractor_cluster(nn.Module):
             x_norm = self.revin(x_norm, "norm")
             x_norm = rearrange(x_norm, "x l (y c) -> (x y) l c", y=self.n_vars)
         else:
-            x_norm = self.revin(x, "norm")
+            x_norm = self.revin(x, "norm") # [batch_size,seq_len,var_nums]
 
-        expert_inputs = dispatcher.dispatch(x_norm)
+        expert_inputs = dispatcher.dispatch(x_norm) # expert_inputs[0].shape :[_,seq_len,var_nums]
 
         gates = dispatcher.expert_to_gates()
         expert_outputs = [
             self.experts[i](expert_inputs[i]) for i in range(self.num_experts)
-        ]
-        y = dispatcher.combine(expert_outputs)
-
+        ] #expert_outputs[0]: [_,d_model,var_nums] 趋势分解结果集
+        y = dispatcher.combine(expert_outputs) # [batch_size,d_model,var_nums] 趋势再组合
         return y, loss

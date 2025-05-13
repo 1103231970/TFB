@@ -60,9 +60,9 @@ class Linear_extractor(nn.Module):
                 trend_output[:, i, :] = self.Linear_Trend[i](
                     trend_init[:, i, :])
         else:
-            seasonal_output = self.Linear_Seasonal(seasonal_init)
-            trend_output = self.Linear_Trend(trend_init)
-        x = seasonal_output + trend_output
+            seasonal_output = self.Linear_Seasonal(seasonal_init) # [_,var_nums,d_model]
+            trend_output = self.Linear_Trend(trend_init) # [_,var_nums,d_model]
+        x = seasonal_output + trend_output # [_,var_nums,d_model]
         return x.permute(0, 2, 1)
 
     def forecast(self, x_enc):
@@ -73,6 +73,6 @@ class Linear_extractor(nn.Module):
     def forward(self, x_enc):
         if x_enc.shape[0] == 0:
             return torch.empty((0, self.pred_len, self.enc_in)).to(x_enc.device)
-        dec_out = self.forecast(x_enc)
+        dec_out = self.forecast(x_enc) # [_,var_nums,d_model]
         return dec_out[:, -self.pred_len:, :]  # [B, L, D]
 

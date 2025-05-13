@@ -40,20 +40,17 @@ class DUETModel(nn.Module):
     def forward(self, input):
         # x: [batch_size, seq_len, n_vars]
         if self.CI:
-            channel_independent_input = rearrange(input, 'b l n -> (b n) l 1')
-
-            reshaped_output, L_importance = self.cluster(channel_independent_input)
-
-            temporal_feature = rearrange(reshaped_output, '(b n) l 1 -> b l n', b=input.shape[0])
-
+            channel_independent_input = rearrange(input, 'b l n -> (b n) l 1') # [batch_size * var_nums,seq_len,1]
+            reshaped_output, L_importance = self.cluster(channel_independent_input) # [batch_size * var_nums,d_model,1]
+            temporal_feature = rearrange(reshaped_output, '(b n) l 1 -> b l n', b=input.shape[0]) # [batch_size,d_model,var_nums]
         else:
-            temporal_feature, L_importance = self.cluster(input)
+            temporal_feature, L_importance = self.cluster(input) # [batch_size,d_model,var_nums]
 
         # B x d_model x n_vars -> B x n_vars x d_model
         temporal_feature = rearrange(temporal_feature, 'b d n -> b n d')
         if self.n_vars > 1:
             changed_input = rearrange(input, 'b l n -> b n l')
-            channel_mask = self.mask_generator(changed_input)
+            channel_mask = self.mask_generator(changed_input) # [batch_size,1,var_nums,var_nums]
 
             channel_group_feature, attention = self.Channel_transformer(x=temporal_feature, attn_mask=channel_mask)
 
