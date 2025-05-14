@@ -1,6 +1,8 @@
 import torch
 from torch import nn
-
+"""
+    [ETTh1] MSE:0.446 MAE:0.443
+"""
 class Network(nn.Module):
     def __init__(self, seq_len, pred_len, patch_len, stride, padding_patch):
         super(Network, self).__init__()
@@ -60,10 +62,10 @@ class Network(nn.Module):
         self.fc8 = nn.Linear(pred_len * 2, pred_len)
 
     def forward(self, s, t):
-        # x: [Batch, Input, Channel]
-        # s - seasonality
-        # t - trend
-        
+        # x: [Batch, Input, Channel]:Batch(batch_size)、 Input(seq_len)、 Channel(var_nums)
+        # s - seasonality [batch_size,seq_len,var_nums]
+        # t - trend [batch_size,seq_len,var_nums]
+
         s = s.permute(0,2,1) # to [Batch, Channel, Input]
         t = t.permute(0,2,1) # to [Batch, Channel, Input]
         
@@ -120,13 +122,14 @@ class Network(nn.Module):
 
         t = self.fc7(t)
 
-        # Streams Concatination
-        x = torch.cat((s, t), dim=1)
-        x = self.fc8(x)
+        # ============== Streams Concatination ==============
+        # s.shape:[batch_size*var_nums,pred_len]
+        # t.shape:[batch_size*var_nums,pred_len]
+        x = torch.cat((s, t), dim=1) # [batch_size*var_nums,pred_len*2]
+        x = self.fc8(x) # [batch_size*var_nums,pred_len]
 
-        # Channel concatination
-        x = torch.reshape(x, (B, C, self.pred_len)) # [Batch, Channel, Output]
-
+        # ============== Channel concatination ==============
+        x = torch.reshape(x, (B, C, self.pred_len)) # [Batch, Channel, Output](batch_size,var_nums,pred_len)
         x = x.permute(0,2,1) # to [Batch, Output, Channel]
 
         return x
