@@ -47,7 +47,7 @@ class DUETModel(nn.Module):
             temporal_feature, L_importance = self.cluster(input) # [batch_size,d_model,var_nums]
 
         # B x d_model x n_vars -> B x n_vars x d_model
-        temporal_feature = rearrange(temporal_feature, 'b d n -> b n d')
+        temporal_feature = rearrange(temporal_feature, 'b d n -> b n d') # [batch_size,var_nums,d_model]
         if self.n_vars > 1:
             changed_input = rearrange(input, 'b l n -> b n l')
             channel_mask = self.mask_generator(changed_input) # [batch_size,1,var_nums,var_nums]
@@ -59,6 +59,6 @@ class DUETModel(nn.Module):
             output = temporal_feature
             output = self.linear_head(output)
 
-        output = rearrange(output, 'b n d -> b d n')
+        output = rearrange(output, 'b n d -> b d n') #[batch_size,pre_len,var_nums]
         output = self.cluster.revin(output, "denorm")
         return output, L_importance
