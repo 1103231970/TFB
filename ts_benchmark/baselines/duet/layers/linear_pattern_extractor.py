@@ -46,7 +46,10 @@ class Linear_extractor(nn.Module):
 
 
     def encoder(self, x):
+        # x.shape [_,seq_len,1]
         seasonal_init, trend_init = self.decompsition(x)
+        # seasonal_init.shape [_,seq_len,1]
+        # trend_init.shape [_,seq_len,1]
         seasonal_init, trend_init = seasonal_init.permute(
             0, 2, 1), trend_init.permute(0, 2, 1)
         if self.individual:
