@@ -38,6 +38,16 @@ DEFAULT_HYPER_PARAMS = {
     "loss": "MAE",
     "lradj": "type1",
     "revin": 1,
+    # CD Param:
+    "activation": "gelu",
+    "output_attention": 0,
+    "dropout": 0.2,
+    "fc_dropout": 0.2,
+    "factor": 1,
+    "n_heads": 8,
+    "d_ff": 512,
+    "d_model": 512,
+    "e_layers": 1,
 }
 
 
@@ -214,7 +224,7 @@ class xPatch(ModelBase):
                         for i in range(self.config.horizon)
                     ]
                 )
-                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cuda")
+                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cpu")
 
                 output = output * self.ratio
                 target = target * self.ratio
@@ -347,7 +357,7 @@ class xPatch(ModelBase):
                         for i in range(self.config.horizon)
                     ]
                 )
-                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cuda")
+                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cpu")
 
                 output = output * self.ratio
                 target = target * self.ratio
