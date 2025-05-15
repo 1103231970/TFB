@@ -67,7 +67,7 @@ class LocalDataSource(DataSource):
     """
 
     #: index column name of the metadata
-    _INDEX_COL = "file_name"
+    _INDEX_COL = "date"
 
     def __init__(self, local_data_path: str, metadata_file_name: str):
         """
@@ -161,7 +161,7 @@ class LocalForecastingDataSource(LocalDataSource):
     def __init__(self):
         super().__init__(
             FORECASTING_DATASET_PATH,
-            "FORECAST_META.csv"
+            "ETTh1.csv"
         )
 
 
