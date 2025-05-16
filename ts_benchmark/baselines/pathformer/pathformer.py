@@ -19,6 +19,8 @@ from ts_benchmark.baselines.utils import (
 from ts_benchmark.utils.data_processing import split_time
 from .utils.tools import EarlyStopping, adjust_learning_rate
 from ...models.model_base import ModelBase, BatchMaker
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_HYPER_PARAMS = {
     "k": 2,
@@ -274,9 +276,9 @@ class Pathformer(ModelBase):
         setattr(self.config, "task_name", "short_term_forecast")
         self.model = PathformerModel(self.config)
 
-        print(
-            "----------------------------------------------------------",
-            self.model_name,
+        logger.info(
+            "======================== [%s] ========================",
+            self.model_name
         )
         config = self.config
         train_data, valid_data = train_val_split(
@@ -335,7 +337,7 @@ class Pathformer(ModelBase):
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
 
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
         train_steps = len(train_data_loader)
         scheduler = lr_scheduler.OneCycleLR(
             optimizer=optimizer,

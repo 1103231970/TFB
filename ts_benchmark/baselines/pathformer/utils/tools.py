@@ -2,6 +2,8 @@ import numpy as np
 import torch
 import matplotlib.pyplot as plt
 import copy
+import logging
+logger = logging.getLogger(__name__)
 
 plt.switch_backend("agg")
 
@@ -43,7 +45,7 @@ def adjust_learning_rate(optimizer, scheduler, epoch, args, printout=True):
         for param_group in optimizer.param_groups:
             param_group["lr"] = lr
         if printout:
-            print("Updating learning rate to {}".format(lr))
+            logger.info("Updating learning rate to {}".format(lr))
 
 
 class EarlyStopping:
@@ -63,7 +65,7 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
         elif score < self.best_score + self.delta:
             self.counter += 1
-            print(f"EarlyStopping counter: {self.counter} out of {self.patience}")
+            logger.info(f"EarlyStopping counter: {self.counter} out of {self.patience}")
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -72,7 +74,7 @@ class EarlyStopping:
             self.counter = 0
 
     def save_checkpoint(self, val_loss, model):
-        print(
+        logger.info(
             f"Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ..."
         )
         self.check_point = copy.deepcopy(model.state_dict())
@@ -152,7 +154,7 @@ def test_params_flop(model, x_shape):
     model_params = 0
     for parameter in model.parameters():
         model_params += parameter.numel()
-        print(
+        logger.info(
             "INFO: Trainable parameter count: {:.2f}M".format(model_params / 1000000.0)
         )
     from ptflops import get_model_complexity_info
@@ -163,5 +165,5 @@ def test_params_flop(model, x_shape):
         )
         # print('Flops:' + flops)
         # print('Params:' + params)
-        print("{:<30}  {:<8}".format("Computational complexity: ", macs))
-        print("{:<30}  {:<8}".format("Number of parameters: ", params))
+        logger.info("{:<30}  {:<8}".format("Computational complexity: ", macs))
+        logger.info("{:<30}  {:<8}".format("Number of parameters: ", params))

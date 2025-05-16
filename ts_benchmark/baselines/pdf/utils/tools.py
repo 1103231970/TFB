@@ -3,6 +3,8 @@ import torch
 import matplotlib.pyplot as plt
 import time
 import copy
+import logging
+logger = logging.getLogger(__name__)
 
 
 plt.switch_backend('agg')
@@ -36,7 +38,7 @@ def adjust_learning_rate(optimizer, scheduler, epoch, args, printout=True):
         lr = lr_adjust[epoch]
         for param_group in optimizer.param_groups:
             param_group['lr'] = lr
-        if printout: print('Updating learning rate to {}'.format(lr))
+        if printout: logger.info('Updating learning rate to {}'.format(lr))
 
 
 class EarlyStopping:
@@ -56,7 +58,7 @@ class EarlyStopping:
             self.save_checkpoint(val_loss, model)
         elif score < self.best_score + self.delta:
             self.counter += 1
-            print(f"EarlyStopping counter: {self.counter} out of {self.patience}")
+            logger.info(f"EarlyStopping counter: {self.counter} out of {self.patience}")
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -65,7 +67,7 @@ class EarlyStopping:
             self.counter = 0
 
     def save_checkpoint(self, val_loss, model):
-        print(
+        logger.info(
             f"Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving models ..."
         )
         self.check_point = copy.deepcopy(model.state_dict())
@@ -111,11 +113,11 @@ def test_params_flop(model, x_shape):
     model_params = 0
     for parameter in model.parameters():
         model_params += parameter.numel()
-        print('INFO: Trainable parameter count: {:.2f}M'.format(model_params / 1000000.0))
+        logger.info('INFO: Trainable parameter count: {:.2f}M'.format(model_params / 1000000.0))
     from ptflops import get_model_complexity_info
     with torch.cuda.device(0):
         macs, params = get_model_complexity_info(model.cuda(), x_shape, as_strings=True, print_per_layer_stat=True)
         # print('Flops:' + flops)
         # print('Params:' + params)
-        print('{:<30}  {:<8}'.format('Computational complexity: ', macs))
-        print('{:<30}  {:<8}'.format('Number of parameters: ', params))
+        logger.info('{:<30}  {:<8}'.format('Computational complexity: ', macs))
+        logger.info('{:<30}  {:<8}'.format('Number of parameters: ', params))

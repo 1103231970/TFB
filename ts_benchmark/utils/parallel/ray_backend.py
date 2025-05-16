@@ -471,7 +471,7 @@ if __name__ == "__main__":
 
     def sleep_func(t):
         time.sleep(t)
-        print(f"sleep after {t}")
+        logger.info(f"sleep after {t}")
         return t
 
     results = []
@@ -486,9 +486,9 @@ if __name__ == "__main__":
 
     for i, res in enumerate(results):
         try:
-            print(f"{i}-th task result: {res.result()}")
+            logger.info(f"{i}-th task result: {res.result()}")
         except TimeoutError:
-            print(f"{i}-th task fails after timeout")
+            logger.info(f"{i}-th task fails after timeout")
 
     backend.close()
     # time.sleep(100)
