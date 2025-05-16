@@ -18,6 +18,8 @@ from ts_benchmark.baselines.utils import (
 )
 from ts_benchmark.utils.data_processing import split_time
 from ...models.model_base import ModelBase, BatchMaker
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_HYPER_PARAMS = {
     "enc_in": 1,
@@ -258,10 +260,11 @@ class DUET(ModelBase):
 
         self.model = DUETModel(self.config)
 
-        print(
-            "----------------------------------------------------------",
-            self.model_name,
+        logger.info(
+            "======================== [%s] ========================",
+            self.model_name
         )
+
         config = self.config
         train_data, valid_data = train_val_split(
             train_valid_data, train_ratio_in_tv, config.seq_len
@@ -319,7 +322,7 @@ class DUET(ModelBase):
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
 
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
 
         for epoch in range(config.num_epochs):
             self.model.train()

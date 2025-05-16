@@ -20,6 +20,8 @@ from ts_benchmark.baselines.utils import (
 )
 from ts_benchmark.baselines.timekan.models.timekan_model import TimeKANModeL
 from ...models.model_base import ModelBase, BatchMaker
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_HYPER_PARAMS = {
     "lradj": "type1",
@@ -263,9 +265,9 @@ class TimeKAN(ModelBase):
         setattr(self.config, "task_name", "long_term_forecast")
         self.model = TimeKANModeL(self.config)
 
-        print(
-            "----------------------------------------------------------",
-            self.model_name,
+        logger.info(
+            "======================== [%s] ========================",
+            self.model_name
         )
         config = self.config
         train_data, valid_data = train_val_split(
@@ -324,7 +326,7 @@ class TimeKAN(ModelBase):
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
 
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
 
         for epoch in range(config.num_epochs):
             self.model.train()

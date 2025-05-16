@@ -19,6 +19,8 @@ from ts_benchmark.baselines.utils import (
 from ts_benchmark.utils.data_processing import split_time
 from ts_benchmark.baselines.pdf.utils.tools import EarlyStopping, adjust_learning_rate
 from ts_benchmark.models.model_base import ModelBase, BatchMaker
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_HYPER_PARAMS = {
     "seq_len": 720,
@@ -277,9 +279,9 @@ class PDF(ModelBase):
         self.config.c_in = n_vars
         self.model = PDF_model(self.config)
 
-        print(
-            "----------------------------------------------------------",
-            self.model_name,
+        logger.info(
+            "======================== [%s] ========================",
+            self.model_name
         )
         config = self.config
         train_data, valid_data = train_val_split(
@@ -340,7 +342,7 @@ class PDF(ModelBase):
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
 
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
         train_steps = len(train_data_loader)
         scheduler = lr_scheduler.OneCycleLR(
             optimizer=optimizer,

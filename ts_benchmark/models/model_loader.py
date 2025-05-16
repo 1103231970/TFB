@@ -99,7 +99,7 @@ def get_model_info(model_config: Dict) -> Union[Dict, Callable]:
             model_info = import_model_info(model_name)
         except (ImportError, AttributeError) as e:
             logger.info("Loading model %s failed", model_name)
-            logger.info(f"Error: {e}")
+            logger.error(f"Error: {e}")
             continue
         else:
             break

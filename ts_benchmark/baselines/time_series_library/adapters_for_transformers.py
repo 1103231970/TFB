@@ -21,6 +21,8 @@ from ts_benchmark.baselines.utils import (
 )
 from ts_benchmark.models.model_base import ModelBase, BatchMaker
 from ts_benchmark.utils.data_processing import split_time
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_HYPER_PARAMS = {
     "top_k": 5,
@@ -286,9 +288,9 @@ class TransformerAdapter(ModelBase):
         device_ids = np.arange(torch.cuda.device_count()).tolist()
         if len(device_ids) > 1 and self.config.parallel_strategy == "DP":
             self.model = nn.DataParallel(self.model, device_ids=device_ids)
-        print(
-            "----------------------------------------------------------",
-            self.model_name,
+        logger.info(
+            "======================== [%s] ========================",
+            self.model_name
         )
         config = self.config
         train_data, valid_data = train_val_split(
@@ -342,7 +344,7 @@ class TransformerAdapter(ModelBase):
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
 
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
 
         for epoch in range(config.num_epochs):
             self.model.train()
@@ -726,7 +728,7 @@ class TransformerAdapter(ModelBase):
         total_params = sum(
             p.numel() for p in self.model.parameters() if p.requires_grad
         )
-        print(f"Total trainable parameters: {total_params}")
+        logger.info(f"Total trainable parameters: {total_params}")
 
         for epoch in range(config.num_epochs):
             self.model.train()
@@ -853,7 +855,7 @@ class TransformerAdapter(ModelBase):
         threshold = np.percentile(combined_energy, 100 - self.config.anomaly_ratio)
         # threshold = np.mean(combined_energy) + 3 * np.std(combined_energy)
 
-        print("Threshold :", threshold)
+        logger.info("Threshold :", threshold)
 
         attens_energy = []
         test_labels = []
@@ -872,7 +874,7 @@ class TransformerAdapter(ModelBase):
 
         pred = (test_energy > threshold).astype(int)
         a = pred.sum() / len(test_energy) * 100
-        print(pred.sum() / len(test_energy) * 100)
+        logger.info(pred.sum() / len(test_energy) * 100)
         return pred, test_energy
 
 
