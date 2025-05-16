@@ -108,7 +108,7 @@ def load_record_data(
             ret.append(cur_record)
         except (FileNotFoundError, PermissionError, KeyError, ParserError):
             # TODO: it is ugly to identify log files by artifact columns...
-            logger.info("unrecognized log file format, skipping %s...", fn)
+            logger.error("unrecognized log file format, skipping %s...", fn)
     return pd.concat(ret, axis=0)
 
 

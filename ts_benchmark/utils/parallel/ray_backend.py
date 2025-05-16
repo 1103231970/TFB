@@ -187,7 +187,7 @@ class RayActorPool:
             try:
                 task_info.result.put(ray.get(task_obj))
             except RayActorError as e:
-                logger.info(
+                logger.error(
                     "task %d died unexpectedly on actor %d: %s",
                     task_id,
                     task_info.actor_id,
@@ -221,7 +221,7 @@ class RayActorPool:
                     self.actors[task_info.actor_id].start_time.remote()
                 )
             except RayActorError as e:
-                logger.info(
+                logger.error(
                     "actor %d died unexpectedly: %s, restarting...",
                     task_info.actor_id,
                     e,
