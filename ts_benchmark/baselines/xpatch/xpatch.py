@@ -226,7 +226,7 @@ class xPatch(ModelBase):
                         for i in range(self.config.horizon)
                     ]
                 )
-                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cpu")
+                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cuda")
 
                 output = output * self.ratio
                 target = target * self.ratio
@@ -359,7 +359,7 @@ class xPatch(ModelBase):
                         for i in range(self.config.horizon)
                     ]
                 )
-                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cpu")
+                self.ratio = torch.tensor(self.ratio).unsqueeze(-1).to("cuda")
 
                 output = output * self.ratio
                 target = target * self.ratio
