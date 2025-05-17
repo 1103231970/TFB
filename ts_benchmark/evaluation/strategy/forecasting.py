@@ -12,7 +12,10 @@ from ts_benchmark.evaluation.strategy.strategy import Strategy
 from ts_benchmark.models import ModelFactory
 from ts_benchmark.utils.data_processing import split_time
 from ts_benchmark.utils.random_utils import fix_random_seed, fix_all_random_seed
+import logging
+import optuna
 
+logger = logging.getLogger(__name__)
 
 class ForecastingStrategy(Strategy, metaclass=abc.ABCMeta):
     """
@@ -51,10 +54,65 @@ class ForecastingStrategy(Strategy, metaclass=abc.ABCMeta):
         meta_info = data_pool.get_series_meta_info(series_name)
 
         try:
-            single_series_results = self._execute(
-                data, meta_info, model_factory, series_name
-            )
+            # single_series_results = self._execute(
+            #     data, meta_info, model_factory, series_name
+            # )
+
+            # ================================== 开始超参数优化实验 ==================================
+            logger.info("***************** [Start Optimize Trial] *****************")
+            single_series_results = None  # 评估指标结果
+            metrics = self.evaluator.metric_names  # 评估指标名称
+            # 设置网格搜索参数
+            search_space = {
+                'batch_size': [32,64,128,256],
+                'lr': [0.0001, 0.0005],
+                'num_epochs': [50, 100],
+                'patience': [5],
+                'seq_len': [96, 336, 512],
+                'dropout': [0.2, 0.4, 0.5],
+                'd_model': [256,512],
+                'd_ff': [512, 1024],
+                'n_heads': [1],
+                'e_layers': [1],
+                'fc_dropout': [0.1]
+            }
+
+            # 实验功能主体
+            def objective(trial):
+                # 定义实验参数
+                model_factory.model_hyper_params["batch_size"] = trial.suggest_categorical("batch_size",[32,64,128,256])
+                model_factory.model_hyper_params["lr"] = trial.suggest_categorical("lr",[0.0001, 0.0005])
+                model_factory.model_hyper_params["num_epochs"] = trial.suggest_categorical("num_epochs",[50, 100])
+                model_factory.model_hyper_params["patience"] = trial.suggest_categorical("patience",[5])
+                model_factory.model_hyper_params["seq_len"] = trial.suggest_categorical("seq_len",[96, 336, 512])
+                model_factory.model_hyper_params["dropout"] = trial.suggest_categorical("dropout",[0.2, 0.4, 0.5])
+                model_factory.model_hyper_params["d_model"] = trial.suggest_categorical("d_model", [256,512])
+                model_factory.model_hyper_params["d_ff"] = trial.suggest_categorical("d_ff", [512, 1024])
+                model_factory.model_hyper_params["n_heads"] = trial.suggest_categorical("n_heads", [1])
+                model_factory.model_hyper_params["e_layers"] = trial.suggest_categorical("e_layers", [1])
+                model_factory.model_hyper_params["fc_dropout"] = trial.suggest_categorical("fc_dropout", [0.1])
+                logger.info("[Trial Number: %d] -> Param:%s", trial.number + 1, model_factory.model_hyper_params)
+                # 开始模型计算
+                single_series_results = self._execute(
+                    data, meta_info, model_factory, series_name
+                )
+                mapping = metric_mapping(metrics, single_series_results)
+                # 定义目标评估
+                mse_norm = mapping["mse_norm"]
+                mae_norm = mapping["mae_norm"]
+                objectives = [mse_norm, mae_norm]
+                logger.info("[Trial Number: %d] -> MSE:%s | MAE:%s", trial.number + 1,mse_norm,mae_norm)
+                return objectives
+
+            # 创建一个实验：网格搜索、评估方向
+            study = optuna.create_study(sampler=optuna.samplers.GridSampler(search_space),directions=["minimize", "minimize"])
+            # 实验调用
+            study.optimize(objective)
+            logger.info("[BEST TRIAL]:", study.best_trials)
+            logger.info("***************** [End Optimize Trial] *****************")
+            # =======================================================================================
         except Exception as e:
+            logger.error(e)
             log = f"{traceback.format_exc()}\n{e}"
             single_series_results = self.get_default_result(
                 **{FieldNames.LOG_INFO: log}
@@ -103,3 +161,13 @@ class ForecastingStrategy(Strategy, metaclass=abc.ABCMeta):
         )
         scaler = StandardScaler().fit(train_data.values)
         return scaler
+
+
+# 整合指标名称和值
+def metric_mapping(metrics, values):
+    # 取较短的长度，以确保一一对应
+    min_length = min(len(metrics), len(values))
+    # 创建映射字典
+    mapping = {metrics[i]: values[i] for i in range(min_length)}
+    print("metric_mapping:", mapping)
+    return mapping
