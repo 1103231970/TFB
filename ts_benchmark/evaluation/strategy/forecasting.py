@@ -108,7 +108,7 @@ class ForecastingStrategy(Strategy, metaclass=abc.ABCMeta):
             study = optuna.create_study(sampler=optuna.samplers.GridSampler(search_space),directions=["minimize", "minimize"])
             # 实验调用
             study.optimize(objective)
-            logger.info("[BEST TRIAL]:", study.best_trials)
+            logger.info("[BEST TRIAL]:%s", study.best_trials)
             logger.info("***************** [End Optimize Trial] *****************")
             # =======================================================================================
         except Exception as e:
